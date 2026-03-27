@@ -1,0 +1,39 @@
+---
+- hosts: ansible_test
+  tasks:
+    - name: dnf upgrafe
+      ansible.builtin.dnf:
+       name: "*"
+       state: latest
+      become: true
+
+    - name: Create test directory
+      file:
+        path: "~/test_dir"
+        state: directory
+
+    - name: Install cronie
+      ansible.builtin.dnf:
+       name: cronie
+       state: latest
+      become: true
+
+    - name:Start crond
+      command: crond
+      become:true
+
+    - name: Cron first Friday execute
+      ansible.builtin.cron:
+       name: "dnf Update"
+       minute: "0"
+       hour: "0"
+       weekday: "fri#1"
+       user: "root"
+       job: "dnf -y update > /var/log/dnf-update.log 2>&1"
+
+    - name: Cron validation
+      ansible.builtin.cron:
+       name: "validation"
+       minute: "0"
+       hour: "0,6,12,18"
+       job: 'echo "$(date "+%Y-%m-%d %H:%M:%S (%a)") cron-job has executed" >> /var/log/cron_validation.log'
