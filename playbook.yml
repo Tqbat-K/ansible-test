@@ -23,7 +23,7 @@
       ansible.builtin.cron:
         name: test
         user: root
-	hour: "12"
+        hour: "12"
         job: 'echo "test has executed!" >> /var/log/test.log'
         cron_file: cron-test
       become: true
